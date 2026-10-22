@@ -64,6 +64,17 @@
 .marquee-wrap:hover .marquee-track{animation-play-state:paused}
 @media(max-width:650px){.recognition-logo{min-width:160px;flex-basis:160px;height:70px}.recognition-logo img{width:150px;height:64px}.marquee-track{gap:12px;animation-duration:23s}}
 @media(prefers-reduced-motion:reduce){.marquee-track{animation:none}}
+
+/* NIIB enquiry popup and embedded map — 22 Oct 2026 */
+.map-panel{display:block;min-height:360px;background:#e8dbe3}
+.niib-popup{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(24,14,27,.72);backdrop-filter:blur(5px)}
+.niib-popup.is-open{display:flex}
+.niib-popup-dialog{position:relative;background:white;color:var(--ink);border-radius:16px;max-width:625px;width:100%;max-height:min(92dvh,920px);overflow-y:auto;box-shadow:0 22px 70px rgba(0,0,0,.29)}
+.niib-popup-dialog .form-card{box-shadow:none;padding:32px 28px 24px}
+.niib-popup-close{position:sticky;top:12px;float:right;z-index:2;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#f1e8ee;color:#532a4c;font-size:24px;line-height:1;cursor:pointer;margin:10px 12px -46px 0}
+.niib-popup-close:focus-visible{outline:3px solid #7b3f70;outline-offset:2px}
+body.niib-popup-active{overflow:hidden}
+@media(max-width:700px){.niib-popup{padding:8px}.niib-popup-dialog{max-height:95dvh;border-radius:12px}.niib-popup-dialog .form-card{padding:30px 18px 20px}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"EducationalOrganization","@id":"https://niiblucknow.com/#organization","name":"New Image International Beauty Institute","alternateName":"NIIB Lucknow","url":"https://niiblucknow.com/","logo":"https://niiblucknow.com/assets/niib-logo.png","telephone":"+91 92781 14526","address":{"@type":"PostalAddress","streetAddress":"1st Floor, Taj Plaza, Madan Mohan Malviya Marg, Above Mist Hotel, near Krishi Bhawan, Parehta, Gokhale Vihar, Hazratganj","addressLocality":"Lucknow","addressRegion":"Uttar Pradesh","postalCode":"226001","addressCountry":"IN"}},{"@type":"WebSite","@id":"https://niiblucknow.com/#website","url":"https://niiblucknow.com/","name":"NIIB Lucknow","publisher":{"@id":"https://niiblucknow.com/#organization"}},{"@type":"WebPage","@id":"https://niiblucknow.com/#webpage","url":"https://niiblucknow.com/","name":"Beauty & Makeup Courses in Lucknow | NIIB Lucknow","isPartOf":{"@id":"https://niiblucknow.com/#website"},"about":{"@id":"https://niiblucknow.com/#organization"},"description":"Beauty, makeup and cosmetology courses in Lucknow with counselling, call support and WhatsApp enquiry.","primaryImageOfPage":"https://niiblucknow.com/assets/niib-logo.png"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What courses are available at NIIB Lucknow?","acceptedAnswer":{"@type":"Answer","text":"You can enquire about professional makeup artistry, hairstyling, nail technician, cosmetology, beauty and skin artistry, spa therapy and other programs listed above. Please confirm the current batches with the admissions team."}},{"@type":"Question","name":"Can I join NIIB if I am a complete beginner?","acceptedAnswer":{"@type":"Answer","text":"You can enquire as a beginner. Entry requirements depend on the individual course. The NIIB admissions team can help you understand the eligibility and choose a suitable starting point."}},{"@type":"Question","name":"How can I check course fees and the next batch date?","acceptedAnswer":{"@type":"Answer","text":"Fees, duration and upcoming batch dates depend on the course. Call +91 9278114526 or request a course counselling session for the latest details."}},{"@type":"Question","name":"Does NIIB offer practical classes?","acceptedAnswer":{"@type":"Answer","text":"NIIB describes its courses as practice-focused. Ask the counsellor for the course-specific practical syllabus, equipment, class format and training schedule before enrolling."}},{"@type":"Question","name":"What certificate will I receive after training?","acceptedAnswer":{"@type":"Answer","text":"The certificate and issuing organization depend on the course. Please request the exact course certificate details and recognition information before admission."}},{"@type":"Question","name":"Can NIIB help me understand career options after a course?","acceptedAnswer":{"@type":"Answer","text":"You can ask the NIIB team about career guidance and any current placement support. Individual employment, income and placement outcomes are not guaranteed."}},{"@type":"Question","name":"Can I visit the NIIB campus before admission?","acceptedAnswer":{"@type":"Answer","text":"Yes, you can request a campus visit. NIIB is listed in Hazratganj, Lucknow. Call the admissions team for directions and to confirm a suitable visiting time."}},{"@type":"Question","name":"How do I contact NIIB admissions?","acceptedAnswer":{"@type":"Answer","text":"Call +91 9278114526 or use the WhatsApp button to ask about courses, admissions, fees and campus visits."}}]}]}</script>
 </head>
@@ -94,7 +105,7 @@
 <p class="hero-desc">Explore industry-focused beauty education with practical learning, admissions guidance, and course counselling for aspiring makeup artists, cosmetologists, hairstylists and beauty professionals.</p>
 <div class="hero-actions">
 <a class="btn btn-primary" href="#enquire">Book Free Course Counselling ↗</a>
-<a class="btn btn-outline" href="#courses">Explore Our Courses →</a>
+<a class="btn btn-outline" href="#courses" id="explore-courses-btn">Explore Our Courses →</a>
 </div>
 <div class="hero-trust">
 <span>Hands-on learning</span>
@@ -212,8 +223,8 @@
 </section>
 <section aria-labelledby="location-title" class="section location" id="location">
 <div class="container location-box">
-<div class="location-info"><p class="eyebrow">Visit our institute</p><h2 id="location-title">Find Us in Lucknow</h2><p>Prefer speaking in person? Get directions to NIIB's listed Hazratganj campus.</p><address class="location-address"><strong>New Image International Beauty Institute</strong><br/>1st Floor, Taj Plaza, Madan Mohan Malviya Marg,<br/>Above Mist Hotel, near Krishi Bhawan,<br/>Parehta, Gokhale Vihar, Hazratganj,<br/>Lucknow, Uttar Pradesh 226001<br/><strong>Phone:</strong> <a href="tel:+919278114526">+91 92781 14526</a></address><div class="location-actions"><a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=New+Image+Institute+Hazratganj+Lucknow" rel="noopener noreferrer" target="_blank">Get Directions ↗</a><a class="btn btn-outline" href="tel:+919278114526">Call Campus</a></div></div>
-<div class="map-panel"><div class="map-inner"><div class="map-pin">⌖</div><h3 class="serif">NIIB Lucknow</h3><p>Hazratganj, Lucknow</p><a class="btn btn-white" href="google.com/maps?um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KVuoGoxG_Zs5MV_0pdM7qjYR&daddr=1st+Floor,+Taj+Plaza,+Madan+Mohan+Malviya+Marg,+above+Mist+Hotel,+near+Krishi+Bhawan,+Parehta,+Gokhale+Vihar,+Hazratganj,+Lucknow,+Uttar+Pradesh+226001"_blank">Open Google Maps ↗</a></div></div>
+<div class="location-info"><p class="eyebrow">Visit our institute</p><h2 id="location-title">Find Us in Lucknow</h2><p>Prefer speaking in person? Get directions to NIIB's listed Hazratganj campus.</p><address class="location-address"><strong>New Image International Beauty Institute</strong><br/>1st Floor, Taj Plaza, Madan Mohan Malviya Marg,<br/>Above Mist Hotel, near Krishi Bhawan,<br/>Parehta, Gokhale Vihar, Hazratganj,<br/>Lucknow, Uttar Pradesh 226001<br/><strong>Phone:</strong> <a href="tel:+919278114526">+91 92781 14526</a></address><div class="location-actions"><a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=26.856336%2C80.9542282" rel="noopener noreferrer" target="_blank">Get Directions ↗</a><a class="btn btn-outline" href="tel:+919278114526">Call Campus</a></div></div>
+<div class="map-panel"><iframe title="NIIB Lucknow campus location on Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="https://www.google.com/maps?q=26.856336%2C80.9542282&amp;z=17&amp;output=embed" style="border:0;width:100%;height:100%;min-height:360px;display:block"></iframe></div>
 </div>
 </section>
 <section aria-labelledby="faq-title" class="section" id="faqs"><div class="container"><div class="section-head"><p class="eyebrow">Admissions FAQs</p><h2 id="faq-title">Frequently Asked Questions About NIIB</h2><p>Get answers to common questions before choosing a beauty course in Lucknow.</p></div><div class="faq-list"><details><summary>What courses are available at NIIB Lucknow?</summary><p>You can enquire about professional makeup artistry, hairstyling, nail technician, cosmetology, beauty and skin artistry, spa therapy and other programs listed above. Please confirm the current batches with the admissions team.</p></details><details><summary>Can I join NIIB if I am a complete beginner?</summary><p>You can enquire as a beginner. Entry requirements depend on the individual course. The NIIB admissions team can help you understand the eligibility and choose a suitable starting point.</p></details><details><summary>How can I check course fees and the next batch date?</summary><p>Fees, duration and upcoming batch dates depend on the course. Call +91 9278114526 or request a course counselling session for the latest details.</p></details><details><summary>Does NIIB offer practical classes?</summary><p>NIIB describes its courses as practice-focused. Ask the counsellor for the course-specific practical syllabus, equipment, class format and training schedule before enrolling.</p></details><details><summary>What certificate will I receive after training?</summary><p>The certificate and issuing organization depend on the course. Please request the exact course certificate details and recognition information before admission.</p></details><details><summary>Can NIIB help me understand career options after a course?</summary><p>You can ask the NIIB team about career guidance and any current placement support. Individual employment, income and placement outcomes are not guaranteed.</p></details><details><summary>Can I visit the NIIB campus before admission?</summary><p>Yes, you can request a campus visit. NIIB is listed in Hazratganj, Lucknow. Call the admissions team for directions and to confirm a suitable visiting time.</p></details><details><summary>How do I contact NIIB admissions?</summary><p>Call +91 9278114526 or use the WhatsApp button to ask about courses, admissions, fees and campus visits.</p></details></div></div></section>
@@ -223,6 +234,7 @@
 </footer>
 <a aria-label="Chat on WhatsApp" class="floating-whatsapp" href="https://api.whatsapp.com/send/?phone=919278114526&text=I+am+interested&type=phone_number&app_absent=0" id="wa-floating" rel="noopener noreferrer" target="_blank">✆</a>
 <div class="mobile-bar"><a class="btn btn-outline" href="tel:+919278114526">☎ Call Now</a><a class="btn btn-primary" href="#enquire">✦ Enquire Now</a></div>
+<div class="niib-popup" id="niib-enquiry-popup" aria-hidden="true"><div class="niib-popup-dialog" role="dialog" aria-modal="true" aria-label="Free course counselling enquiry"><button class="niib-popup-close" id="niib-popup-close" aria-label="Close enquiry form" type="button">&times;</button><div id="niib-popup-form-slot"></div></div></div>
 <script>
     const LEAD_API_ENDPOINT = '/api/leads'; // Vercel server-side endpoint.
     const WA_NUMBER = '919278114526';
@@ -269,6 +281,62 @@
     });
     document.querySelectorAll('a[href^="tel:"]').forEach(a => a.addEventListener('click', () => window.dataLayer?.push({ event:'call_click' })));
     document.querySelector('#wa-floating').addEventListener('click', () => window.dataLayer?.push({ event:'whatsapp_click' }));
+
+    // Enhanced course navigation; preserve the existing #courses section.
+    document.querySelector('#explore-courses-btn')?.addEventListener('click', event => {
+      const section = document.querySelector('#courses');
+      if (!section) return;
+      event.preventDefault();
+      section.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',block:'start'});
+      history.replaceState(null,'','#courses');
+    });
+    // Move (never duplicate) the actual form into a modal to preserve API/UTM functionality.
+    (() => {
+      const popup = document.querySelector('#niib-enquiry-popup');
+      const slot = document.querySelector('#niib-popup-form-slot');
+      const close = document.querySelector('#niib-popup-close');
+      const home = form.parentElement;
+      const anchor = document.createComment('NIIB original enquiry form location');
+      home.insertBefore(anchor,form);
+      let lastFocused = null;
+      function showEnquiry() {
+        if(popup.classList.contains('is-open')) return;
+        lastFocused = document.activeElement;
+        slot.appendChild(form);
+        popup.classList.add('is-open');
+        popup.setAttribute('aria-hidden','false');
+        document.body.classList.add('niib-popup-active');
+        close.focus();
+      }
+      function hideEnquiry() {
+        if(!popup.classList.contains('is-open')) return;
+        anchor.parentNode.insertBefore(form,anchor.nextSibling);
+        popup.classList.remove('is-open');
+        popup.setAttribute('aria-hidden','true');
+        document.body.classList.remove('niib-popup-active');
+        if(lastFocused && lastFocused.isConnected) lastFocused.focus();
+      }
+      close.addEventListener('click',hideEnquiry);
+      popup.addEventListener('click',event=>{if(event.target===popup)hideEnquiry();});
+      document.addEventListener('keydown',event=>{
+        if(!popup.classList.contains('is-open')) return;
+        if(event.key==='Escape') {event.preventDefault();hideEnquiry();}
+        if(event.key==='Tab') {
+          const focusables = [...popup.querySelectorAll('button:not(:disabled),a[href],input:not([disabled]):not([tabindex="-1"]),select:not([disabled])')].filter(el=>el.getClientRects().length);
+          if(!focusables.length)return;
+          const first=focusables[0],last=focusables[focusables.length-1];
+          if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+          else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+        }
+      });
+      document.querySelectorAll('a[href="#enquire"]').forEach(link=>link.addEventListener('click',event=>{
+        event.preventDefault();
+        showEnquiry();
+      }));
+      // Open immediately on every full page load, including repeat visits.
+      // Uses the existing form and its Google Sheets API connection.
+      showEnquiry();
+    })();
   </script>
 </body>
 </html>
