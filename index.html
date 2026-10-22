@@ -224,13 +224,31 @@
 <a aria-label="Chat on WhatsApp" class="floating-whatsapp" href="https://api.whatsapp.com/send/?phone=919278114526&text=I+am+interested&type=phone_number&app_absent=0" id="wa-floating" rel="noopener noreferrer" target="_blank">✆</a>
 <div class="mobile-bar"><a class="btn btn-outline" href="tel:+919278114526">☎ Call Now</a><a class="btn btn-primary" href="#enquire">✦ Enquire Now</a></div>
 <script>
-    const LEAD_API_ENDPOINT = ''; // Example: '/api/leads' or Vercel serverless endpoint.
+    const LEAD_API_ENDPOINT = '/api/leads'; // Vercel server-side endpoint.
     const WA_NUMBER = '919278114526';
     const form = document.querySelector('#lead-form');
     const statusEl = document.querySelector('#form-status');
     const submitBtn = document.querySelector('#submit-btn');
     document.querySelector('#year').textContent = new Date().getFullYear();
     const params = new URLSearchParams(location.search);
+    // Persist ad attribution across navigation and repeat visits (30 days).
+    const attributionKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid','fbclid'];
+    let savedAttribution = {};
+    try {
+      const stored = JSON.parse(localStorage.getItem('niib_ad_attribution') || '{}');
+      if (Date.now() - (stored.savedAt || 0) < 30 * 86400000) savedAttribution = stored.values || {};
+      attributionKeys.forEach(key => {
+        const value = params.get(key);
+        if (value) savedAttribution[key] = value.slice(0, 250);
+      });
+      localStorage.setItem('niib_ad_attribution', JSON.stringify({savedAt:Date.now(),values:savedAttribution}));
+    } catch (_) { attributionKeys.forEach(key => { if (params.get(key)) savedAttribution[key] = params.get(key).slice(0,250); }); }
+    function inferChannel() {
+      const src = (savedAttribution.utm_source || '').toLowerCase();
+      if (src.includes('google') || savedAttribution.gclid || savedAttribution.gbraid || savedAttribution.wbraid) return 'Google Ads';
+      if (['facebook','instagram','meta','fb','ig'].some(s => src.includes(s)) || savedAttribution.fbclid) return 'Meta Ads';
+      return src ? 'Other / '+src : 'Direct / Unknown';
+    }
     const allowedCourses = [...document.querySelector('#course').options].map(o => o.value);
     const initialCourse = params.get('course');
     if (initialCourse && allowedCourses.includes(initialCourse)) document.querySelector('#course').value = initialCourse;
@@ -243,9 +261,9 @@
       if (!/^[6-9]\d{9}$/.test(phone)) { statusEl.classList.add('error'); statusEl.textContent = 'Please enter a valid 10-digit Indian mobile number.'; return; }
       if (form.website.value) return;
       if (!LEAD_API_ENDPOINT) { statusEl.classList.add('error'); statusEl.textContent = 'Demo mode: lead submissions are not connected yet. Please use Call or WhatsApp to contact admissions.'; return; }
-      const body = { name: form.name.value.trim(), phone, course: form.course.value, timeline: form.timeline.value, preferredContact: form.preferredContact.value, consent: true, source: location.pathname, utm_source: params.get('utm_source'), utm_medium: params.get('utm_medium'), utm_campaign: params.get('utm_campaign'), gclid: params.get('gclid'), fbclid: params.get('fbclid') };
+      const body = { name: form.name.value.trim(), phone, course: form.course.value, timeline: form.timeline.value, preferredContact: form.preferredContact.value, consent: true, source: location.pathname, leadChannel: inferChannel(), pageUrl: location.href.slice(0,800), ...savedAttribution };
       submitBtn.disabled = true; submitBtn.textContent = 'Submitting…';
-      try { const response = await fetch(LEAD_API_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if (!response.ok) throw new Error('Unable to submit enquiry'); statusEl.classList.add('success'); statusEl.textContent = 'Thank you! Your enquiry has been received.'; form.reset(); window.dataLayer?.push({ event:'lead_submit', course: body.course }); }
+      try { const response = await fetch(LEAD_API_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const result = await response.json(); if (!response.ok || result.success !== true) throw new Error('Unable to save enquiry'); statusEl.classList.add('success'); statusEl.textContent = 'Thank you! Your enquiry has been received.'; form.reset(); window.dataLayer?.push({ event:'lead_submit', course: body.course }); }
       catch (error) { statusEl.classList.add('error'); statusEl.textContent = 'Your enquiry could not be submitted. Please call the admissions team instead.'; }
       finally { submitBtn.disabled = false; submitBtn.textContent = 'Request Free Counselling →'; }
     });
