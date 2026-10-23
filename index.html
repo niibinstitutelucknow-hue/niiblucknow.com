@@ -307,7 +307,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (!LEAD_API_ENDPOINT) { statusEl.classList.add('error'); statusEl.textContent = 'Demo mode: lead submissions are not connected yet. Please use Call or WhatsApp to contact admissions.'; return; }
       const body = { name: form.name.value.trim(), phone, course: form.course.value, timeline: form.timeline.value, preferredContact: form.preferredContact.value, consent: true, source: location.pathname, leadChannel: inferChannel(), pageUrl: location.href.slice(0,800), ...savedAttribution };
       submitBtn.disabled = true; submitBtn.textContent = 'Submitting…';
-      try { const response = await fetch(LEAD_API_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const result = await response.json(); if (!response.ok || result.success !== true) throw new Error('Unable to save enquiry'); statusEl.classList.add('success'); statusEl.textContent = 'Thank you! Your enquiry has been received.'; form.reset(); window.dataLayer?.push({ event:'lead_submit', course: body.course }); }
+        
+try {
+  const response = await fetch(LEAD_API_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || result.success !== true) {
+    throw new Error('Unable to save enquiry');
+  }
+
+  statusEl.classList.add('success');
+  statusEl.textContent = 'Thank you! Your enquiry has been received.';
+  form.reset();
+
+  // Existing GTM event
+  window.dataLayer?.push({
+    event: 'lead_submit',
+    course: body.course
+  });
+
+  // NEW: Meta Pixel Lead event
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'Lead', {
+      content_name: 'NIIB Lucknow - Course Enquiry',
+      content_category: body.course
+    });
+  }
+}
+
+      
       catch (error) { statusEl.classList.add('error'); statusEl.textContent = 'Your enquiry could not be submitted. Please call the admissions team instead.'; }
       finally { submitBtn.disabled = false; submitBtn.textContent = 'Request Free Counselling →'; }
     });
