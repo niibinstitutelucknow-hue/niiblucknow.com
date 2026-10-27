@@ -116,7 +116,13 @@ body.niib-popup-active{overflow:hidden}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"EducationalOrganization","@id":"https://niiblucknow.com/#organization","name":"New Image International Beauty Institute","alternateName":"NIIB Lucknow","url":"https://niiblucknow.com/","logo":"https://niiblucknow.com/assets/niib-logo.png","telephone":"+91 92781 14526","address":{"@type":"PostalAddress","streetAddress":"1st Floor, Taj Plaza, Madan Mohan Malviya Marg, Above Mist Hotel, near Krishi Bhawan, Parehta, Gokhale Vihar, Hazratganj","addressLocality":"Lucknow","addressRegion":"Uttar Pradesh","postalCode":"226001","addressCountry":"IN"}},{"@type":"WebSite","@id":"https://niiblucknow.com/#website","url":"https://niiblucknow.com/","name":"NIIB Lucknow","publisher":{"@id":"https://niiblucknow.com/#organization"}},{"@type":"WebPage","@id":"https://niiblucknow.com/#webpage","url":"https://niiblucknow.com/","name":"Beauty & Makeup Courses in Lucknow | NIIB Lucknow","isPartOf":{"@id":"https://niiblucknow.com/#website"},"about":{"@id":"https://niiblucknow.com/#organization"},"description":"Beauty, makeup and cosmetology courses in Lucknow with counselling, call support and WhatsApp enquiry.","primaryImageOfPage":"https://niiblucknow.com/assets/niib-logo.png"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What courses are available at NIIB Lucknow?","acceptedAnswer":{"@type":"Answer","text":"You can enquire about professional makeup artistry, hairstyling, nail technician, cosmetology, beauty and skin artistry, spa therapy and other programs listed above. Please confirm the current batches with the admissions team."}},{"@type":"Question","name":"Can I join NIIB if I am a complete beginner?","acceptedAnswer":{"@type":"Answer","text":"You can enquire as a beginner. Entry requirements depend on the individual course. The NIIB admissions team can help you understand the eligibility and choose a suitable starting point."}},{"@type":"Question","name":"How can I check course fees and the next batch date?","acceptedAnswer":{"@type":"Answer","text":"Fees, duration and upcoming batch dates depend on the course. Call +91 9278114526 or request a course counselling session for the latest details."}},{"@type":"Question","name":"Does NIIB offer practical classes?","acceptedAnswer":{"@type":"Answer","text":"NIIB describes its courses as practice-focused. Ask the counsellor for the course-specific practical syllabus, equipment, class format and training schedule before enrolling."}},{"@type":"Question","name":"What certificate will I receive after training?","acceptedAnswer":{"@type":"Answer","text":"The certificate and issuing organization depend on the course. Please request the exact course certificate details and recognition information before admission."}},{"@type":"Question","name":"Can NIIB help me understand career options after a course?","acceptedAnswer":{"@type":"Answer","text":"You can ask the NIIB team about career guidance and any current placement support. Individual employment, income and placement outcomes are not guaranteed."}},{"@type":"Question","name":"Can I visit the NIIB campus before admission?","acceptedAnswer":{"@type":"Answer","text":"Yes, you can request a campus visit. NIIB is listed in Hazratganj, Lucknow. Call the admissions team for directions and to confirm a suitable visiting time."}},{"@type":"Question","name":"How do I contact NIIB admissions?","acceptedAnswer":{"@type":"Answer","text":"Call +91 9278114526 or use the WhatsApp button to ask about courses, admissions, fees and campus visits."}}]}]}</script>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  // Allow the Turnstile library to notify us after it finishes loading.
+  window.niibTurnstileLoaded = function () {
+    window.niibRenderTurnstile?.();
+  };
+</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=niibTurnstileLoaded" async defer></script>
 
 </head>
 <body>
@@ -267,11 +273,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="field"><label for="timeline">When would you join? *</label><select id="timeline" name="timeline" required=""><option value="">Select timeline</option><option>Immediately</option><option>Within 1 Month</option><option>Within 3 Months</option><option>Just Exploring</option></select></div>
 <div class="field full"><label for="preferredContact">Preferred counselling method</label><select id="preferredContact" name="preferredContact"><option>Phone Call</option><option>WhatsApp</option><option>Campus Visit</option></select></div>
 </div>
-<div
-  class="cf-turnstile"
-  data-sitekey="0x4AAAAAAFoH6MmR0nFTfPxU"
-  data-theme="light"
-></div>
+<div id="niib-turnstile" data-sitekey="0x4AAAAAAFoH6MmR0nFTfPxU" aria-label="Security verification"></div>
 
 <div aria-hidden="true" style="position:absolute;left:-9999px"><label for="website">Website</label><input autocomplete="off" id="website" name="website" tabindex="-1"/></div>
 <label class="consent"><input id="consent" required="" type="checkbox"/><span>I agree to be contacted by NIIB about my course enquiry by phone or WhatsApp. I have read the <a href="/privacy-policy.html" rel="noopener" target="_blank">Privacy Policy</a>.</span></label>
@@ -338,6 +340,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (initialCourse && allowedCourses.includes(initialCourse)) document.querySelector('#course').value = initialCourse;
     document.querySelectorAll('.course-link').forEach(link => link.addEventListener('click', () => document.querySelector('#course').value = link.dataset.course));
     document.querySelector('#wa-floating').href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hello NIIB, I would like to know more about your beauty courses in Lucknow.')}`;
+    // Turnstile iframes must not be moved between the page and popup.
+    // Unmount first, move the same form, then create a fresh widget in place.
+    const turnstileHost = document.querySelector('#niib-turnstile');
+    let turnstileWidgetId = null;
+    function renderLeadTurnstile() {
+      if (!window.turnstile || !turnstileHost || turnstileWidgetId !== null) return;
+      turnstileWidgetId = window.turnstile.render(turnstileHost, {
+        sitekey: turnstileHost.dataset.sitekey,
+        theme: 'light'
+      });
+    }
+    function removeLeadTurnstile() {
+      if (turnstileWidgetId !== null && window.turnstile) {
+        window.turnstile.remove(turnstileWidgetId);
+      }
+      turnstileWidgetId = null;
+      turnstileHost.replaceChildren();
+    }
+    window.niibRenderTurnstile = renderLeadTurnstile;
     form.addEventListener('submit', async e => {
       e.preventDefault(); statusEl.className = 'form-status'; statusEl.textContent = '';
       if (!form.reportValidity()) return;
@@ -346,7 +367,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (form.website.value) return;
       if (!LEAD_API_ENDPOINT) { statusEl.classList.add('error'); statusEl.textContent = 'Demo mode: lead submissions are not connected yet. Please use Call or WhatsApp to contact admissions.'; return; }
         
-      const turnstileToken = window.turnstile?.getResponse();
+      const turnstileToken = turnstileWidgetId !== null ? window.turnstile?.getResponse(turnstileWidgetId) : null;
 
       if (!turnstileToken) {
         statusEl.classList.add('error');
@@ -406,7 +427,7 @@ try {
       catch (error) { statusEl.classList.add('error'); statusEl.textContent = 'Your enquiry could not be submitted. Please call the admissions team instead.'; }
       
 finally {
-  window.turnstile?.reset();
+  if (turnstileWidgetId !== null) window.turnstile?.reset(turnstileWidgetId);
   submitBtn.disabled = false;
   submitBtn.textContent = 'Request Free Counselling →';
 }
@@ -435,18 +456,22 @@ finally {
       function showEnquiry() {
         if(popup.classList.contains('is-open')) return;
         lastFocused = document.activeElement;
+        removeLeadTurnstile();
         slot.appendChild(form);
         popup.classList.add('is-open');
         popup.setAttribute('aria-hidden','false');
         document.body.classList.add('niib-popup-active');
         close.focus();
+        renderLeadTurnstile();
       }
       function hideEnquiry() {
         if(!popup.classList.contains('is-open')) return;
+        removeLeadTurnstile();
         anchor.parentNode.insertBefore(form,anchor.nextSibling);
         popup.classList.remove('is-open');
         popup.setAttribute('aria-hidden','true');
         document.body.classList.remove('niib-popup-active');
+        renderLeadTurnstile();
         if(lastFocused && lastFocused.isConnected) lastFocused.focus();
       }
       close.addEventListener('click',hideEnquiry);
@@ -469,6 +494,8 @@ finally {
       // Open immediately on every full page load, including repeat visits.
       // Uses the existing form and its Google Sheets API connection.
       showEnquiry();
+      // Handles the case where the Cloudflare script loaded before our page script.
+      renderLeadTurnstile();
     })();
   </script>
     
