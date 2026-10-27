@@ -116,6 +116,8 @@ body.niib-popup-active{overflow:hidden}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"EducationalOrganization","@id":"https://niiblucknow.com/#organization","name":"New Image International Beauty Institute","alternateName":"NIIB Lucknow","url":"https://niiblucknow.com/","logo":"https://niiblucknow.com/assets/niib-logo.png","telephone":"+91 92781 14526","address":{"@type":"PostalAddress","streetAddress":"1st Floor, Taj Plaza, Madan Mohan Malviya Marg, Above Mist Hotel, near Krishi Bhawan, Parehta, Gokhale Vihar, Hazratganj","addressLocality":"Lucknow","addressRegion":"Uttar Pradesh","postalCode":"226001","addressCountry":"IN"}},{"@type":"WebSite","@id":"https://niiblucknow.com/#website","url":"https://niiblucknow.com/","name":"NIIB Lucknow","publisher":{"@id":"https://niiblucknow.com/#organization"}},{"@type":"WebPage","@id":"https://niiblucknow.com/#webpage","url":"https://niiblucknow.com/","name":"Beauty & Makeup Courses in Lucknow | NIIB Lucknow","isPartOf":{"@id":"https://niiblucknow.com/#website"},"about":{"@id":"https://niiblucknow.com/#organization"},"description":"Beauty, makeup and cosmetology courses in Lucknow with counselling, call support and WhatsApp enquiry.","primaryImageOfPage":"https://niiblucknow.com/assets/niib-logo.png"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What courses are available at NIIB Lucknow?","acceptedAnswer":{"@type":"Answer","text":"You can enquire about professional makeup artistry, hairstyling, nail technician, cosmetology, beauty and skin artistry, spa therapy and other programs listed above. Please confirm the current batches with the admissions team."}},{"@type":"Question","name":"Can I join NIIB if I am a complete beginner?","acceptedAnswer":{"@type":"Answer","text":"You can enquire as a beginner. Entry requirements depend on the individual course. The NIIB admissions team can help you understand the eligibility and choose a suitable starting point."}},{"@type":"Question","name":"How can I check course fees and the next batch date?","acceptedAnswer":{"@type":"Answer","text":"Fees, duration and upcoming batch dates depend on the course. Call +91 9278114526 or request a course counselling session for the latest details."}},{"@type":"Question","name":"Does NIIB offer practical classes?","acceptedAnswer":{"@type":"Answer","text":"NIIB describes its courses as practice-focused. Ask the counsellor for the course-specific practical syllabus, equipment, class format and training schedule before enrolling."}},{"@type":"Question","name":"What certificate will I receive after training?","acceptedAnswer":{"@type":"Answer","text":"The certificate and issuing organization depend on the course. Please request the exact course certificate details and recognition information before admission."}},{"@type":"Question","name":"Can NIIB help me understand career options after a course?","acceptedAnswer":{"@type":"Answer","text":"You can ask the NIIB team about career guidance and any current placement support. Individual employment, income and placement outcomes are not guaranteed."}},{"@type":"Question","name":"Can I visit the NIIB campus before admission?","acceptedAnswer":{"@type":"Answer","text":"Yes, you can request a campus visit. NIIB is listed in Hazratganj, Lucknow. Call the admissions team for directions and to confirm a suitable visiting time."}},{"@type":"Question","name":"How do I contact NIIB admissions?","acceptedAnswer":{"@type":"Answer","text":"Call +91 9278114526 or use the WhatsApp button to ask about courses, admissions, fees and campus visits."}}]}]}</script>
 
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
@@ -265,6 +267,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="field"><label for="timeline">When would you join? *</label><select id="timeline" name="timeline" required=""><option value="">Select timeline</option><option>Immediately</option><option>Within 1 Month</option><option>Within 3 Months</option><option>Just Exploring</option></select></div>
 <div class="field full"><label for="preferredContact">Preferred counselling method</label><select id="preferredContact" name="preferredContact"><option>Phone Call</option><option>WhatsApp</option><option>Campus Visit</option></select></div>
 </div>
+    
+<div class="cf-turnstile"
+     data-sitekey="0x4AAAAAAFoH6MmR0nFTfPxU"></div>
+
 <div aria-hidden="true" style="position:absolute;left:-9999px"><label for="website">Website</label><input autocomplete="off" id="website" name="website" tabindex="-1"/></div>
 <label class="consent"><input id="consent" required="" type="checkbox"/><span>I agree to be contacted by NIIB about my course enquiry by phone or WhatsApp. I have read the <a href="/privacy-policy.html" rel="noopener" target="_blank">Privacy Policy</a>.</span></label>
 <button class="btn btn-primary" id="submit-btn" type="submit">Request Free Counselling →</button>
@@ -294,25 +300,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const submitBtn = document.querySelector('#submit-btn');
     document.querySelector('#year').textContent = new Date().getFullYear();
     const params = new URLSearchParams(location.search);
-    // Persist ad attribution across navigation and repeat visits (30 days).
-    const attributionKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid','fbclid'];
-    let savedAttribution = {};
-    try {
-      const stored = JSON.parse(localStorage.getItem('niib_ad_attribution') || '{}');
-      if (Date.now() - (stored.savedAt || 0) < 30 * 86400000) savedAttribution = stored.values || {};
-      attributionKeys.forEach(key => {
-        const value = params.get(key);
-        if (value) savedAttribution[key] = value.slice(0, 250);
-      });
-      localStorage.setItem('niib_ad_attribution', JSON.stringify({savedAt:Date.now(),values:savedAttribution}));
-    } catch (_) { attributionKeys.forEach(key => { if (params.get(key)) savedAttribution[key] = params.get(key).slice(0,250); }); }
+
+    // Capture attribution from the current page URL only.
+    // Prevent old GCLIDs from being reused on direct visits.
+    const attributionKeys = [
+      'utm_source', 'utm_medium', 'utm_campaign',
+      'utm_content', 'utm_term',
+      'gclid', 'gbraid', 'wbraid', 'fbclid'
+    ];
+
+    const savedAttribution = {};
+
+    attributionKeys.forEach(key => {
+      const value = params.get(key);
+      if (value) savedAttribution[key] = value.slice(0, 250);
+    });
+
     function inferChannel() {
       const src = (savedAttribution.utm_source || '').toLowerCase();
-      if (src.includes('google') || savedAttribution.gclid || savedAttribution.gbraid || savedAttribution.wbraid) return 'Google Ads';
-      if (['facebook','instagram','meta','fb','ig'].some(s => src.includes(s)) || savedAttribution.fbclid) return 'Meta Ads';
-      return src ? 'Other / '+src : 'Direct / Unknown';
+      const medium = (savedAttribution.utm_medium || '').toLowerCase();
+
+      if (src === 'google' && medium === 'cpc') {
+        return 'Google Ads - Unverified';
+      }
+
+      if (['facebook', 'instagram', 'meta', 'fb', 'ig'].includes(src)) {
+        return 'Meta Ads - Unverified';
+      }
+
+      return src ? 'Other / ' + src : 'Direct / Unknown';
     }
-    const allowedCourses = [...document.querySelector('#course').options].map(o => o.value);
+   
+ const allowedCourses = [...document.querySelector('#course').options].map(o => o.value);
     const initialCourse = params.get('course');
     if (initialCourse && allowedCourses.includes(initialCourse)) document.querySelector('#course').value = initialCourse;
     document.querySelectorAll('.course-link').forEach(link => link.addEventListener('click', () => document.querySelector('#course').value = link.dataset.course));
@@ -324,7 +343,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (!/^[6-9]\d{9}$/.test(phone)) { statusEl.classList.add('error'); statusEl.textContent = 'Please enter a valid 10-digit Indian mobile number.'; return; }
       if (form.website.value) return;
       if (!LEAD_API_ENDPOINT) { statusEl.classList.add('error'); statusEl.textContent = 'Demo mode: lead submissions are not connected yet. Please use Call or WhatsApp to contact admissions.'; return; }
-      const body = { name: form.name.value.trim(), phone, course: form.course.value, timeline: form.timeline.value, preferredContact: form.preferredContact.value, consent: true, source: location.pathname, leadChannel: inferChannel(), pageUrl: location.href.slice(0,800), ...savedAttribution };
+        
+      const turnstileToken = window.turnstile?.getResponse();
+
+      if (!turnstileToken) {
+        statusEl.classList.add('error');
+        statusEl.textContent = 'Please complete security verification.';
+        return;
+      }
+
+      
+const body = {
+  name: form.name.value.trim(),
+  phone,
+  course: form.course.value,
+  timeline: form.timeline.value,
+  preferredContact: form.preferredContact.value,
+  consent: true,
+  turnstileToken,
+  source: location.pathname,
+  leadChannel: inferChannel(),
+  pageUrl: location.href.slice(0, 800),
+  ...savedAttribution
+};
       submitBtn.disabled = true; submitBtn.textContent = 'Submitting…';
         
 try {
@@ -361,7 +402,13 @@ try {
 
       
       catch (error) { statusEl.classList.add('error'); statusEl.textContent = 'Your enquiry could not be submitted. Please call the admissions team instead.'; }
-      finally { submitBtn.disabled = false; submitBtn.textContent = 'Request Free Counselling →'; }
+      
+finally {
+  window.turnstile?.reset();
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Request Free Counselling →';
+}
+
     });
     document.querySelectorAll('a[href^="tel:"]').forEach(a => a.addEventListener('click', () => window.dataLayer?.push({ event:'call_click' })));
     document.querySelector('#wa-floating').addEventListener('click', () => window.dataLayer?.push({ event:'whatsapp_click' }));
