@@ -12,6 +12,18 @@
   gtag('config', 'AW-18551802288');
 </script>
     
+<!-- NIIB - Website Form Submit Conversion -->
+<script>
+  function trackNIIBFormSubmit() {
+    if (typeof gtag === 'function') {
+      gtag('event', 'conversion', {
+        'send_to': 'AW-18551802288/YOUR_CONVERSION_LABEL'
+      });
+    }
+  }
+</script>
+
+    
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -431,6 +443,10 @@ try {
       content_category: body.course
     });
   }
+    
+  // Google Ads - Form Submit Conversion
+  trackNIIBFormSubmit();
+
 }
 
       
